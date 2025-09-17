@@ -35,10 +35,8 @@ prompt = ChatPromptTemplate.from_messages([
 
 chain = prompt | llm | StrOutputParser()
 
-print("Hi, I am Albert, how can I help you today?")
 
 def chat(user_input, hist):
-    print(user_input, hist)
 
     langchain_history = []
     for item in hist:
@@ -51,6 +49,10 @@ def chat(user_input, hist):
 
     return "", hist + [{"role": "user", "content": user_input},
                 {"role": "assistant", "content": response}]
+
+
+def clear_chat():
+    return "", []
 
 
 page = gr.Blocks(
@@ -66,13 +68,16 @@ with page:
         """
     )
 
-    chatbot = gr.Chatbot(type="messages")
+    chatbot = gr.Chatbot(type="messages",
+                         avatar_images=[None, "einstein.png"],
+                         show_label=False)
 
-    msg = gr.Textbox()
+    msg = gr.Textbox(show_label=False, placeholder="Ask Einstein anything...")
 
     msg.submit(chat, [msg, chatbot], [msg, chatbot])
 
     clear = gr.Button("Clear Chat")
+    clear.click(clear_chat, outputs=[msg, chatbot])
 
 
-page.launch(share=True)
+page.launch()
